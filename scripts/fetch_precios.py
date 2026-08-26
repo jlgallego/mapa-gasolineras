@@ -15,6 +15,7 @@ Genera:
 import json
 import re
 import sys
+import tempfile
 import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
@@ -29,6 +30,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT_DIR = ROOT / "web" / "public" / "data"
 OUT_GEOJSON = OUT_DIR / "gasolineras.geojson"
 OUT_META = OUT_DIR / "meta.json"
+FNMT_CA = Path(__file__).resolve().parent / "certs" / "fnmt-ac-componentes.pem"
 
 # Combustibles que queremos exponer como filtro -> palabras clave para
 # encontrar la columna correspondiente en el Excel (los nombres exactos de
@@ -90,7 +92,15 @@ def main() -> None:
 
     print(f"Descargando {URL} ...")
     system_ca = Path("/etc/ssl/certs/ca-certificates.crt")
+    temporary_ca = None
     verify = str(system_ca) if system_ca.is_file() else True
+    if FNMT_CA.is_file():
+        base_ca = system_ca if system_ca.is_file() else Path(requests.certs.where())
+        temporary_ca = tempfile.NamedTemporaryFile(mode="w", suffix=".pem", delete=False)
+        temporary_ca.write(base_ca.read_text(encoding="utf-8"))
+        temporary_ca.write(FNMT_CA.read_text(encoding="utf-8"))
+        temporary_ca.close()
+        verify = temporary_ca.name
     try:
         resp = requests.get(
             URL,
@@ -100,10 +110,12 @@ def main() -> None:
         )
     except SSLError as exc:
         raise SystemExit(
-            "No se pudo validar el certificado TLS del geoportal. En WSL, "
-            "instala el certificado intermedio FNMT siguiendo las instrucciones "
-            "del README y vuelve a ejecutar el script. No uses verify=False."
+            "No se pudo validar el certificado TLS del geoportal. "
+            "Comprueba que el certificado intermedio FNMT está disponible."
         ) from exc
+    finally:
+        if temporary_ca is not None:
+            Path(temporary_ca.name).unlink(missing_ok=True)
     resp.raise_for_status()
     tmp_xls = ROOT / "scripts" / "_tmp_precios.xls"
     tmp_xls.write_bytes(resp.content)

@@ -68,22 +68,9 @@ Si vuelves a abrir la terminal, activa de nuevo `.venv` antes de ejecutar el
 script. Así `pip` instala las dependencias en el proyecto y no en el Python
 del sistema (PEP 668).
 
-Si WSL muestra `CERTIFICATE_VERIFY_FAILED` al descargar el XLS, el servidor
-del geoportal está omitiendo el certificado intermedio de FNMT. Instálalo en
-el almacén de certificados de WSL y actualiza dicho almacén:
-
-```bash
-sudo apt update
-sudo apt install --reinstall ca-certificates
-curl -fsSL http://www.cert.fnmt.es/certs/ACCOMP.crt -o /tmp/ACCOMP.crt
-openssl x509 -inform DER -in /tmp/ACCOMP.crt -out /tmp/ACCOMP.pem
-sudo cp /tmp/ACCOMP.pem /usr/local/share/ca-certificates/ACCOMP.crt
-sudo update-ca-certificates
-```
-
-Después, activa `.venv` otra vez y ejecuta `python scripts/fetch_precios.py`.
-El script usa el almacén de certificados de WSL cuando está disponible y
-mantiene la verificación TLS activa.
+El servidor del geoportal omite el certificado intermedio de FNMT. El script
+incluye ese certificado en `scripts/certs/` y lo combina temporalmente con el
+almacén de confianza del sistema, manteniendo la verificación TLS activa.
 
 Esto genera `web/public/data/gasolineras.geojson` y `meta.json`. **La primera
 vez, revisa la lista de columnas que imprime el script por consola**: los
