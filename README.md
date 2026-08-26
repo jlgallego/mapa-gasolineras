@@ -89,9 +89,13 @@ npm run dev
 
 ### 3. Actualización automática cada hora
 
-El workflow `.github/workflows/update-data.yml` ya está listo: al subir el
-proyecto a GitHub, se ejecuta cada hora (`cron: "5 * * * *"`), regenera el
-GeoJSON, lo commitea y —si despliegas en GitHub Pages— reconstruye el sitio.
+Para publicar en GitHub Pages, activa primero **Settings → Pages → Build and
+deployment → Source → GitHub Actions**. GitHub no permite crear este sitio
+automáticamente usando el `GITHUB_TOKEN` del workflow.
+
+Después, el workflow `.github/workflows/update-data.yml` se ejecuta al subir
+el proyecto y cada hora (`cron: "5 * * * *"`), regenera el GeoJSON, lo commitea
+y reconstruye el sitio.
 Si prefieres Vercel/Netlify, borra el segundo job (`desplegar-pages`); el
 `git push` del primer job ya dispara su redeploy automático. También puedes
 lanzarlo a mano desde la pestaña "Actions" de GitHub (`workflow_dispatch`).

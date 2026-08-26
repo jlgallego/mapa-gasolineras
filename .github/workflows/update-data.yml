@@ -55,8 +55,6 @@ jobs:
           node-version: "20"
       - run: npm ci
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - run: npm run build
       - uses: actions/upload-pages-artifact@v4
         with:
