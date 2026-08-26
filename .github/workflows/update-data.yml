@@ -1,0 +1,59 @@
+name: Actualizar precios de gasolineras
+
+on:
+  schedule:
+    # Cada hora, en el minuto 5 (dando margen a que el MITECO publique el XLS)
+    - cron: "5 * * * *"
+  workflow_dispatch: {}   # permite lanzarlo también a mano desde GitHub
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  actualizar-datos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install pandas requests xlrd
+
+      - name: Descargar y procesar precios
+        run: python scripts/fetch_precios.py
+
+      - name: Commitear datos actualizados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add web/public/data/gasolineras.geojson web/public/data/meta.json
+          git diff --staged --quiet && echo "Sin cambios" || git commit -m "Actualizar precios ($(date -u +%Y-%m-%dT%H:%MZ))"
+          git push
+
+  # Si despliegas el front en GitHub Pages, este job lo reconstruye con los
+  # datos nuevos. Si usas Vercel/Netlify, bórralo: esos servicios ya
+  # redespliegan solo con el push anterior (o llama a su Deploy Hook aquí).
+  desplegar-pages:
+    needs: actualizar-datos
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
+      - uses: actions/deploy-pages@v4
