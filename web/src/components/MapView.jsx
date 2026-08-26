@@ -33,7 +33,7 @@ export default function MapView({ data, activeFuel, userLocation, onCountChange 
       map.addSource(SOURCE_ID, {
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
-        cluster: true,
+        cluster: false,
         clusterRadius: 45,
         clusterMaxZoom: 13,
         clusterProperties: {

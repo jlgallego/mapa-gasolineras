@@ -1,6 +1,8 @@
 name: Actualizar precios de gasolineras
 
 on:
+  push:
+    branches: [main]
   schedule:
     # Cada hora, en el minuto 5 (dando margen a que el MITECO publique el XLS)
     - cron: "5 * * * *"
@@ -52,6 +54,7 @@ jobs:
         with:
           node-version: "20"
       - run: npm ci
+      - uses: actions/configure-pages@v5
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

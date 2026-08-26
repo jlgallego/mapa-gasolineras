@@ -21,6 +21,7 @@ from pathlib import Path
 
 import pandas as pd
 import requests
+from requests.exceptions import SSLError
 
 URL = "https://geoportalgasolineras.es/geoportal/resources/files/preciosEESS_es.xls"
 
@@ -88,13 +89,28 @@ def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     print(f"Descargando {URL} ...")
-    resp = requests.get(URL, timeout=60, headers={"User-Agent": "Mozilla/5.0"})
+    system_ca = Path("/etc/ssl/certs/ca-certificates.crt")
+    verify = str(system_ca) if system_ca.is_file() else True
+    try:
+        resp = requests.get(
+            URL,
+            timeout=60,
+            headers={"User-Agent": "Mozilla/5.0"},
+            verify=verify,
+        )
+    except SSLError as exc:
+        raise SystemExit(
+            "No se pudo validar el certificado TLS del geoportal. En WSL, "
+            "instala el certificado intermedio FNMT siguiendo las instrucciones "
+            "del README y vuelve a ejecutar el script. No uses verify=False."
+        ) from exc
     resp.raise_for_status()
     tmp_xls = ROOT / "scripts" / "_tmp_precios.xls"
     tmp_xls.write_bytes(resp.content)
 
     # El fichero es .xls (formato antiguo). xlrd>=2.0 solo soporta .xls, no .xlsx.
-    df = pd.read_excel(tmp_xls, engine="xlrd")
+    # Las tres primeras filas contienen metadatos; la cabecera empieza en la 4.
+    df = pd.read_excel(tmp_xls, engine="xlrd", header=3)
     tmp_xls.unlink(missing_ok=True)
 
     columns_norm = {normalize(c): c for c in df.columns}
