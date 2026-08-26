@@ -3,8 +3,8 @@ import MapView from "./components/MapView.jsx";
 import Filters from "./components/Filters.jsx";
 import { applyFilters } from "./fuels.js";
 
-const DATA_URL = "/data/gasolineras.geojson";
-const META_URL = "/data/meta.json";
+const DATA_URL = `${import.meta.env.BASE_URL}data/gasolineras.geojson`;
+const META_URL = `${import.meta.env.BASE_URL}data/meta.json`;
 
 export default function App() {
   const [raw, setRaw] = useState(null);
