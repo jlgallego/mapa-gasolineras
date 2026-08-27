@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { FUELS } from "../fuels.js";
 
 export default function Filters({
@@ -14,17 +15,33 @@ export default function Filters({
   rankingView,
   onToggleRanking,
 }) {
+  const [panelOpen, setPanelOpen] = useState(false);
   const update = (patch) => setFilters((f) => ({ ...f, ...patch }));
 
   return (
     <aside className="panel">
-      <h1>Gasolineras en España</h1>
-      <p className="subtitle">
-        {visibleCount.toLocaleString("es-ES")} estaciones con los filtros actuales
-        {meta && (
-          <> · datos de {new Date(meta.actualizado).toLocaleString("es-ES")}</>
-        )}
-      </p>
+      <div className="panel-header">
+        <div>
+          <h1>Gasolineras en España</h1>
+          <p className="subtitle">
+            {visibleCount.toLocaleString("es-ES")} estaciones con los filtros actuales
+            {meta && (
+              <> · datos de {new Date(meta.actualizado).toLocaleString("es-ES")}</>
+            )}
+          </p>
+        </div>
+        <button
+          type="button"
+          className="panel-toggle"
+          aria-expanded={panelOpen}
+          aria-controls="map-filters"
+          onClick={() => setPanelOpen((open) => !open)}
+        >
+          {panelOpen ? "Ocultar" : "Filtros"}
+        </button>
+      </div>
+
+      <div id="map-filters" className="panel-content">
 
       <div className="fuel-tabs">
         {FUELS.map((f) => (
@@ -138,6 +155,7 @@ export default function Filters({
           onToggleRanking={onToggleRanking}
         />
       </section>
+      </div>
     </aside>
   );
 }
