@@ -48,6 +48,20 @@ export function getPriceLevel(price, bands) {
   return bands[2].key;
 }
 
+export function getPriceRankings(features, fuel) {
+  const priced = features
+    .map((feature) => ({
+      feature,
+      price: feature.properties.precios[fuel],
+    }))
+    .filter(({ price }) => price !== undefined && price !== null);
+
+  return {
+    cheapest: priced.toSorted((a, b) => a.price - b.price).slice(0, 10),
+    mostExpensive: priced.toSorted((a, b) => b.price - a.price).slice(0, 10),
+  };
+}
+
 // Distancia Haversine en km entre dos puntos [lon, lat]
 export function distKm([lon1, lat1], [lon2, lat2]) {
   const R = 6371;

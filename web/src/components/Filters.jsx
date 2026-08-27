@@ -9,6 +9,10 @@ export default function Filters({
   onLocate,
   locating,
   priceBands,
+  rankings,
+  onSelectStation,
+  rankingView,
+  onToggleRanking,
 }) {
   const update = (patch) => setFilters((f) => ({ ...f, ...patch }));
 
@@ -111,6 +115,66 @@ export default function Filters({
           </button>
         ))}
       </div>
+
+      <section className="rankings" aria-label="Ranking de precios">
+        <h2 className="rankings-title">Ranking de precios</h2>
+        <p className="rankings-scope">
+          {filters.province || "Toda España"} · {FUELS.find((f) => f.key === filters.fuel)?.label}
+        </p>
+        <RankingList
+          title="10 más baratas"
+          entries={rankings.cheapest}
+          viewKey="cheapest"
+          activeView={rankingView}
+          onSelectStation={onSelectStation}
+          onToggleRanking={onToggleRanking}
+        />
+        <RankingList
+          title="10 más caras"
+          entries={rankings.mostExpensive}
+          viewKey="mostExpensive"
+          activeView={rankingView}
+          onSelectStation={onSelectStation}
+          onToggleRanking={onToggleRanking}
+        />
+      </section>
     </aside>
+  );
+}
+
+function RankingList({ title, entries, viewKey, activeView, onSelectStation, onToggleRanking }) {
+  const isActive = activeView === viewKey;
+  return (
+    <details className="ranking-list" open>
+      <summary>
+        <span>{title}</span>
+        <button
+          type="button"
+          className="ranking-toggle"
+          onClick={(event) => {
+            event.preventDefault();
+            onToggleRanking(isActive ? null : viewKey);
+          }}
+        >
+          {isActive ? "Mostrar todas" : "Mostrar solo estas"}
+        </button>
+      </summary>
+      <ol>
+        {entries.map(({ feature, price }) => {
+          const { rotulo, localidad, municipio } = feature.properties;
+          return (
+            <li key={`${feature.properties.cp}-${feature.geometry.coordinates.join(",")}`}>
+              <button type="button" className="ranking-button" onClick={() => onSelectStation(feature)}>
+                <span className="ranking-name" title={rotulo || "Estación"}>
+                  {rotulo || "Estación"}
+                  <small>{localidad || municipio || ""}</small>
+                </span>
+                <strong>{price.toFixed(3)} €</strong>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+    </details>
   );
 }

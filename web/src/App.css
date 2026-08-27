@@ -174,7 +174,148 @@ body { color: var(--ink); }
 .dot.yellow { background: var(--yellow); }
 .dot.red { background: var(--red); }
 
+.rankings {
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1px solid #2b5951;
+}
+
+.rankings-title {
+  margin: 0;
+  color: var(--paper);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 16px;
+}
+
+.rankings-scope {
+  margin: 4px 0 12px;
+  color: #b7d9d2;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ranking-list {
+  border-top: 1px solid #2b5951;
+}
+
+.ranking-list summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 0;
+  color: var(--paper);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ranking-toggle {
+  padding: 4px 6px;
+  border: 1px solid #47766d;
+  border-radius: 3px;
+  background: transparent;
+  color: #b7d9d2;
+  font: inherit;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.ranking-toggle:hover,
+.ranking-toggle:focus-visible {
+  background: var(--panel-bg-2);
+  color: var(--paper);
+  outline: none;
+}
+
+.ranking-list ol {
+  margin: 0 0 8px;
+  padding: 0 0 0 25px;
+}
+
+.ranking-list li {
+  min-height: 31px;
+  padding: 0;
+}
+
+.ranking-button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 31px;
+  gap: 8px;
+  padding: 3px 0 3px 3px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--paper);
+  font: inherit;
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ranking-button:hover,
+.ranking-button:focus-visible {
+  border-color: #47766d;
+  background: var(--panel-bg-2);
+  outline: none;
+}
+
+.ranking-name {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-name small {
+  display: block;
+  overflow: hidden;
+  color: #8eb8af;
+  font-size: 9px;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-list strong {
+  color: var(--accent);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.station-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.station-navigation a {
+  padding: 5px 7px;
+  border-radius: 3px;
+  background: var(--panel-bg);
+  color: var(--paper);
+  font-size: 11px;
+  text-decoration: none;
+}
+
+.station-navigation a:hover,
+.station-navigation a:focus-visible {
+  background: var(--accent);
+  color: var(--ink);
+}
+
 .map-container { width: 100%; height: 100%; }
+
+.maplibregl-marker {
+  cursor: grab;
+}
+
+.maplibregl-marker:active {
+  cursor: grabbing;
+}
 
 .loading {
   display: flex;
