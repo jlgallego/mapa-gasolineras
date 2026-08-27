@@ -1,11 +1,14 @@
 export const FUELS = [
   { key: "gasolina_95", label: "Gasolina 95" },
+  { key: "gasolina_95_premium", label: "Gasolina 95 Premium" },
   { key: "gasolina_98", label: "Gasolina 98" },
   { key: "gasoleo_a", label: "Gasóleo A" },
   { key: "gasoleo_premium", label: "Gasóleo Premium" },
   { key: "gasoleo_b", label: "Gasóleo B" },
+  { key: "gasoleo_c", label: "Gasóleo C" },
   { key: "glp", label: "GLP" },
   { key: "gnc", label: "GNC" },
+  { key: "gnl", label: "GNL" },
 ];
 
 export function fmtPrice(v) {
