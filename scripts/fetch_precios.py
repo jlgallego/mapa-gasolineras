@@ -37,13 +37,16 @@ FNMT_CA = Path(__file__).resolve().parent / "certs" / "fnmt-ac-componentes.pem"
 # columna han cambiado alguna vez, así que buscamos por contenido normalizado
 # en vez de por nombre exacto).
 FUEL_KEYWORDS = {
-    "gasolina_95": ["precio gasolina 95"],
-    "gasolina_98": ["precio gasolina 98"],
-    "gasoleo_a": ["precio gasoleo a", "precio gasoleo/gasoil a"],
+    "gasolina_95": ["precio gasolina 95 e5"],
+    "gasolina_95_premium": ["precio gasolina 95 e5 premium"],
+    "gasolina_98": ["precio gasolina 98 e5"],
+    "gasoleo_a": ["precio gasoleo a"],
+    "gasoleo_b": ["precio gasoleo b"],
+    "gasoleo_c": ["precio gasoleo c"],          # ← lo tenías completamente sin mapear
     "gasoleo_premium": ["precio gasoleo premium"],
-    "gasoleo_b": ["precio gasoleo b", "precio gasoleo/gasoil b"],
-    "glp": ["precio gases licuados", "precio glp"],
+    "glp": ["precio gases licuados del petroleo"],
     "gnc": ["precio gas natural comprimido"],
+    "gnl": ["precio gas natural licuado"],       # ← también existe y no lo cubrías
 }
 
 INFO_KEYWORDS = {
@@ -65,11 +68,10 @@ def normalize(s: str) -> str:
     return re.sub(r"\s+", " ", s)
 
 
-def find_column(columns_norm: dict, keywords: list[str]) -> str | None:
-    for kw in keywords:
-        for norm, original in columns_norm.items():
-            if kw in norm:
-                return original
+def find_column(columns_norm: dict, exact_names: list[str]) -> str | None:
+    for name in exact_names:
+        if name in columns_norm:
+            return columns_norm[name]
     return None
 
 
@@ -97,7 +99,7 @@ def main() -> None:
     if FNMT_CA.is_file():
         base_ca = system_ca if system_ca.is_file() else Path(requests.certs.where())
         temporary_ca = tempfile.NamedTemporaryFile(mode="w", suffix=".pem", delete=False)
-        temporary_ca.write(base_ca.read_text(encoding="utf-8"))
+        temporary_ca.write(base_ca.read_text(encoding="utf-8").rstrip("\n") + "\n")
         temporary_ca.write(FNMT_CA.read_text(encoding="utf-8"))
         temporary_ca.close()
         verify = temporary_ca.name

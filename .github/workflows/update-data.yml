@@ -60,3 +60,6 @@ jobs:
         with:
           path: web/dist
       - uses: actions/deploy-pages@v4
+concurrency:
+  group: actualizar-datos
+  cancel-in-progress: false
