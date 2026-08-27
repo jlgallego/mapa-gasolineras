@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import MapView from "./components/MapView.jsx";
 import Filters from "./components/Filters.jsx";
-import { applyFilters } from "./fuels.js";
+import { applyFilters, getPriceBands } from "./fuels.js";
 
 const DATA_URL = `${import.meta.env.BASE_URL}data/gasolineras.geojson`;
 const META_URL = `${import.meta.env.BASE_URL}data/meta.json`;
@@ -18,6 +18,7 @@ export default function App() {
     brand: "",
     open24h: false,
     maxDistanceKm: null,
+    priceLevel: null,
   });
 
   useEffect(() => {
@@ -36,9 +37,17 @@ export default function App() {
     [meta]
   );
 
+  const priceBands = useMemo(() => {
+    if (!raw) return [];
+    const scope = filters.province
+      ? raw.features.filter((f) => f.properties.provincia === filters.province)
+      : raw.features;
+    return getPriceBands(scope, filters.fuel);
+  }, [raw, filters.province, filters.fuel]);
+
   const filtered = useMemo(
-    () => applyFilters(raw, filters, userLocation),
-    [raw, filters, userLocation]
+    () => applyFilters(raw, { ...filters, priceBands }, userLocation),
+    [raw, filters, priceBands, userLocation]
   );
 
   const handleLocate = () => {
@@ -68,8 +77,9 @@ export default function App() {
         meta={meta}
         onLocate={handleLocate}
         locating={locating}
+        priceBands={priceBands}
       />
-      <MapView data={filtered} activeFuel={filters.fuel} userLocation={userLocation} />
+      <MapView data={filtered} activeFuel={filters.fuel} priceBands={priceBands} userLocation={userLocation} />
     </div>
   );
 }

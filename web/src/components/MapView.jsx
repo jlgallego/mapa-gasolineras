@@ -10,7 +10,7 @@ const MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 
 const SOURCE_ID = "gasolineras";
 
-export default function MapView({ data, activeFuel, userLocation, onCountChange }) {
+export default function MapView({ data, activeFuel, priceBands, userLocation, onCountChange }) {
   const mapRef = useRef(null);
   const containerRef = useRef(null);
   const popupRef = useRef(null);
@@ -36,10 +36,6 @@ export default function MapView({ data, activeFuel, userLocation, onCountChange 
         cluster: false,
         clusterRadius: 45,
         clusterMaxZoom: 13,
-        clusterProperties: {
-          // precio mínimo del combustible activo dentro de cada cluster
-          minPrice: ["min", ["get", "activePrice"]],
-        },
       });
 
       map.addLayer({
@@ -48,13 +44,7 @@ export default function MapView({ data, activeFuel, userLocation, onCountChange 
         source: SOURCE_ID,
         filter: ["has", "point_count"],
         paint: {
-          "circle-color": [
-            "step",
-            ["get", "minPrice"],
-            "#1a9850", 1.5,
-            "#fee08b", 1.7,
-            "#d73027",
-          ],
+          "circle-color": ["match", ["get", "activeLevel"], "cheap", "#1a9850", "medium", "#fee08b", "#d73027"],
           "circle-radius": ["step", ["get", "point_count"], 14, 25, 18, 100, 24, 750, 30],
           "circle-stroke-width": 2,
           "circle-stroke-color": "#fff",
@@ -80,13 +70,7 @@ export default function MapView({ data, activeFuel, userLocation, onCountChange 
         source: SOURCE_ID,
         filter: ["!", ["has", "point_count"]],
         paint: {
-          "circle-color": [
-            "step",
-            ["get", "activePrice"],
-            "#1a9850", 1.5,
-            "#fee08b", 1.7,
-            "#d73027",
-          ],
+          "circle-color": ["match", ["get", "activeLevel"], "cheap", "#1a9850", "medium", "#fee08b", "#d73027"],
           "circle-radius": 7,
           "circle-stroke-width": 2,
           "circle-stroke-color": "#fff",
@@ -145,6 +129,7 @@ export default function MapView({ data, activeFuel, userLocation, onCountChange 
           properties: {
             ...f.properties,
             activePrice: f.properties.precios[activeFuel] ?? null,
+            activeLevel: priceBands.find((band) => f.properties.precios[activeFuel] <= band.max)?.key ?? null,
             precios: JSON.stringify(f.properties.precios),
           },
         })),
@@ -155,7 +140,7 @@ export default function MapView({ data, activeFuel, userLocation, onCountChange 
 
     if (map.isStyleLoaded()) setData();
     else map.once("load", setData);
-  }, [data, activeFuel]);
+  }, [data, activeFuel, priceBands]);
 
   // Centra el mapa en la ubicación del usuario cuando esté disponible
   useEffect(() => {

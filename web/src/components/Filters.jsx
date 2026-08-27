@@ -8,6 +8,7 @@ export default function Filters({
   meta,
   onLocate,
   locating,
+  priceBands,
 }) {
   const update = (patch) => setFilters((f) => ({ ...f, ...patch }));
 
@@ -95,11 +96,21 @@ export default function Filters({
         </div>
       </label>
 
-      <p className="legend">
-        <span className="dot green" /> barato &nbsp;
-        <span className="dot yellow" /> medio &nbsp;
-        <span className="dot red" /> caro
-      </p>
+      <div className="legend" aria-label="Niveles de precio">
+        <p className="legend-title">Precio en este ámbito</p>
+        {priceBands.map((band) => (
+          <button
+            key={band.key}
+            type="button"
+            className={`legend-item ${filters.priceLevel === band.key ? "active" : ""}`}
+            onClick={() => update({ priceLevel: filters.priceLevel === band.key ? null : band.key })}
+            aria-pressed={filters.priceLevel === band.key}
+          >
+            <span className={`dot ${band.color}`} />
+            <span>{band.label}</span>
+          </button>
+        ))}
+      </div>
     </aside>
   );
 }
