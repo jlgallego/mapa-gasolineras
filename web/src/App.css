@@ -369,6 +369,10 @@ body { color: var(--ink); }
     box-shadow: 0 8px 24px rgb(0 0 0 / 25%);
   }
 
+  .maplibregl-ctrl-top-right {
+    z-index: 1;
+  }
+
   .panel-toggle { display: block; }
 
   .panel-closed .panel-content { display: none; }

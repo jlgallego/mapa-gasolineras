@@ -19,7 +19,7 @@ export default function Filters({
   const update = (patch) => setFilters((f) => ({ ...f, ...patch }));
 
   return (
-    <aside className="panel">
+    <aside className={`panel ${panelOpen ? "panel-open" : "panel-closed"}`}>
       <div className="panel-header">
         <div>
           <h1>Gasolineras en España</h1>
